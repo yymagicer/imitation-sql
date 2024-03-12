@@ -47,7 +47,7 @@ public class InsertExpression<T> extends AbstractSqlExpression {
             for (Object o : entitys) {
                 builder.append(" (").append(String.join(",", getFieldValues(columnList, o))).append(" )").append(",");
             }
-            return builder.substring(0, builder.length() - 1);
+            return builder.substring(0, builder.lastIndexOf(","));
         } else {
             return builder.append("value ( ").append(String.join(",", getFieldValues(columnList, entity))).append(" )").toString();
         }

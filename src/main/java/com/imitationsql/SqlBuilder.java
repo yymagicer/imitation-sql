@@ -18,6 +18,10 @@ public class SqlBuilder<T> {
 
     private WhereExpression<T> whereExpression;
 
+    private OrderByExpression<T> orderByExpression;
+
+    private GroupByExpression<T> groupByExpression;
+
     private Class<T> entityClass;
     /**
      * sql节点
@@ -78,21 +82,31 @@ public class SqlBuilder<T> {
     /**
      * group by
      *
-     * @param groupByExpression
+     * @param expression
      * @return
      */
-    public SqlBuilder<T> groupBy(GroupByExpression<T> groupByExpression) {
-        return next(groupByExpression);
+    public SqlBuilder<T> groupBy(Expression<GroupByExpression<T>> expression) {
+        if (null == this.groupByExpression) {
+            this.groupByExpression = new GroupByExpression<>();
+            next(groupByExpression);
+        }
+        expression.apply(this.groupByExpression);
+        return this;
     }
 
     /**
      * order by
      *
-     * @param orderByExpression
+     * @param expression
      * @return
      */
-    public SqlBuilder<T> orderBy(OrderByExpression<T> orderByExpression) {
-        return next(orderByExpression);
+    public SqlBuilder<T> orderBy(Expression<OrderByExpression<T>> expression) {
+        if (null == this.orderByExpression) {
+            this.orderByExpression = new OrderByExpression<>();
+            next(orderByExpression);
+        }
+        expression.apply(this.orderByExpression);
+        return this;
     }
 
     /**
