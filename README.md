@@ -15,9 +15,30 @@ java代码中像写编写SQL语句一样，编写代码
 
 #### 使用说明
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+
+
+```java
+//1.select
+SqlBuilder<UserEntity> sqlBuilder = new SqlBuilder<>(UserEntity.class);
+String sql = sqlBuilder.select().buildSql();
+
+//2.select where
+SqlBuilder<UserEntity> sqlBuilder = new SqlBuilder<>(UserEntity.class);
+String sql = sqlBuilder.select().where(o -> o.and(UserEntity::getUserName, "11").and(UserEntity::getPassword, "1234")).buildSql();
+
+//3.select Where group by order by
+SqlBuilder<UserEntity> sqlBuilder = new SqlBuilder<>(UserEntity.class);
+String sql = sqlBuilder.select().where(o -> o.and(UserEntity::getUserName, "11").and(UserEntity::getPassword, "1234")).groupBy(o -> o.groupBy(UserEntity::getUserName)).orderBy(o -> o.asc(UserEntity::getUserName)).buildSql();
+
+//4.select  join where
+SqlBuilder<UserEntity> sqlBuilder = new SqlBuilder<>(UserEntity.class);
+String sql = sqlBuilder.select().leftJoin(o -> o.eq(UserRoleEntity.class, UserEntity::getId, UserRoleEntity::getUserId))
+        .innerJoin(o -> o.eq(UserRoleEntity.class, RoleEntity.class, UserRoleEntity::getRoleId, RoleEntity::getId))
+        .where(o -> o.and(UserEntity::getUserName, "11").and(UserRoleEntity.class, UserRoleEntity::getRoleId, "1")).buildSql();
+        
+```
+
+
 
 #### 参与贡献
 
