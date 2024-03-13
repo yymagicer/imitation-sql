@@ -11,6 +11,16 @@ import lombok.Getter;
 @Getter
 public enum SqlKeyword {
 
+    SELECT("SELECT"),
+    INSERT("INSERT"),
+    UPDATE("UPDATE"),
+    DELETE("DELETE"),
+    FROM("FROM"),
+    WHERE("WHERE"),
+    VALUE("VALUE"),
+    VALUES("VALUES"),
+    INTO("INTO"),
+    ON("ON"),
     AND("AND"),
     OR("OR"),
     NOT("NOT"),
@@ -34,7 +44,11 @@ public enum SqlKeyword {
     BETWEEN("BETWEEN"),
     NOT_BETWEEN("NOT BETWEEN"),
     ASC("ASC"),
-    DESC("DESC");
+    DESC("DESC"),
+    LEFT_JOIN("LEFT JOIN"),
+    INNER_JOIN("INNER JOIN"),
+    RIGHT_JOIN("RIGHT JOIN"),
+    ;
 
     private final String keyword;
 

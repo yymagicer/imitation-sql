@@ -6,16 +6,16 @@ import lombok.Setter;
  * <p>Description: some description </p>
  *
  * @author : xiaodong.yang
- * @date : 2024/3/12 16:53
+ * @date : 2024/3/13 10:42
  */
 @Setter
 @Getter
-@TableName("t_user")
-public class UserEntity {
+@TableName("t_user_role")
+public class UserRoleEntity {
 
     private String id;
 
-    private String userName;
+    private String roleId;
 
-    private String password;
+    private String userId;
 }

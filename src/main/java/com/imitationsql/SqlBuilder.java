@@ -62,6 +62,44 @@ public class SqlBuilder<T> {
         return this;
     }
 
+    /**
+     * left join
+     *
+     * @param expression
+     * @return
+     */
+    public SqlBuilder<T> leftJoin(Expression<LeftJoinExpression<T>> expression) {
+        LeftJoinExpression<T> leftJoinExpression = new LeftJoinExpression<>();
+        next(leftJoinExpression);
+        expression.apply(leftJoinExpression);
+        return this;
+    }
+
+    /**
+     * left join
+     *
+     * @param expression
+     * @return
+     */
+    public SqlBuilder<T> innerJoin(Expression<InnerJoinExpression<T>> expression) {
+        InnerJoinExpression<T> innerJoinExpression = new InnerJoinExpression<>();
+        next(innerJoinExpression);
+        expression.apply(innerJoinExpression);
+        return this;
+    }
+
+    /**
+     * left join
+     *
+     * @param expression
+     * @return
+     */
+    public SqlBuilder<T> rightJoin(Expression<RightJoinExpression<T>> expression) {
+        RightJoinExpression<T> rightJoinExpression = new RightJoinExpression<>();
+        next(rightJoinExpression);
+        expression.apply(rightJoinExpression);
+        return this;
+    }
 
     /**
      * where

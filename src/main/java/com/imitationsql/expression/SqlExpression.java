@@ -1,5 +1,8 @@
 package com.imitationsql.expression;
 
+import cn.hutool.core.util.StrUtil;
+import com.imitationsql.annotation.TableName;
+
 /**
  * <p>Description: sql表达式 </p>
  *
@@ -15,4 +18,21 @@ public interface SqlExpression<T> {
      * @return
      */
     String sql();
+
+    /**
+     * 获取表名
+     *
+     * @param entityClass
+     * @return
+     */
+    default String getTableName(Class<?> entityClass) {
+        TableName annotation = entityClass.getAnnotation(TableName.class);
+        String tableName;
+        if (null == annotation) {
+            tableName = StrUtil.toUnderlineCase(entityClass.getSimpleName());
+        } else {
+            tableName = annotation.value();
+        }
+        return tableName;
+    }
 }

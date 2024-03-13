@@ -2,7 +2,9 @@ package com.imitationsql.expression;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
+import com.imitationsql.enums.SqlKeyword;
 import com.imitationsql.exception.ImitationSqlException;
+import com.imitationsql.util.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +21,7 @@ import java.util.stream.Collectors;
  */
 @Setter
 @Getter
-public class InsertExpression<T> extends AbstractSqlExpression {
+public class InsertExpression<T> extends AbstractSqlExpression<T> {
 
     /**
      * 列集合
@@ -33,7 +35,7 @@ public class InsertExpression<T> extends AbstractSqlExpression {
         }
         Class<?> entityClass = getEntityClass();
         String tableName = getTableName();
-        StringBuilder builder = new StringBuilder("insert into ").append(tableName).append(" ( ");
+        StringBuilder builder = new StringBuilder(StringUtil.wrapBlank(SqlKeyword.INSERT.getKeyword())).append(StringUtil.wrapBlank(SqlKeyword.INTO.getKeyword())).append(tableName).append(" ( ");
         List<String> columnList;
         if (CollUtil.isEmpty(columns)) {
             columnList = Arrays.stream(ReflectUtil.getFields(entityClass)).map(Field::getName).collect(Collectors.toList());
@@ -42,14 +44,14 @@ public class InsertExpression<T> extends AbstractSqlExpression {
         }
         builder.append(String.join(",", columnList)).append(" ) ");
         if (batch) {
-            builder.append(" values ");
+            builder.append(StringUtil.wrapBlank(SqlKeyword.VALUES.getKeyword()));
             List<Object> entitys = (List<Object>) entity;
             for (Object o : entitys) {
                 builder.append(" (").append(String.join(",", getFieldValues(columnList, o))).append(" )").append(",");
             }
             return builder.substring(0, builder.lastIndexOf(","));
         } else {
-            return builder.append("value ( ").append(String.join(",", getFieldValues(columnList, entity))).append(" )").toString();
+            return builder.append(StringUtil.wrapBlank(SqlKeyword.VALUES.getKeyword())).append("( ").append(String.join(",", getFieldValues(columnList, entity))).append(" )").toString();
         }
     }
 }

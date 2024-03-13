@@ -3,7 +3,9 @@ package com.imitationsql.expression;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.imitationsql.enums.SqlKeyword;
 import com.imitationsql.exception.ImitationSqlException;
+import com.imitationsql.util.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -38,15 +40,15 @@ public class SelectExpression<T> extends AbstractSqlExpression<T> {
             throw new ImitationSqlException("entityClass can not null");
         }
         String tableName = getTableName(entityClass);
-        StringBuilder builder = new StringBuilder("select");
+        StringBuilder builder = new StringBuilder(SqlKeyword.SELECT.getKeyword());
         List<String> columnList;
         if (CollUtil.isEmpty(columns)) {
-            columnList = Arrays.stream(ReflectUtil.getFields(entityClass)).map(item -> StrUtil.toUnderlineCase(item.getName())).collect(Collectors.toList());
+            columnList = Arrays.stream(ReflectUtil.getFields(entityClass)).map(item -> tableName + "." + StrUtil.toUnderlineCase(item.getName())).collect(Collectors.toList());
         } else {
             columnList = columns;
         }
         builder.append(" ").append(String.join(",", columnList));
-        builder.append(" from ").append(tableName);
+        builder.append(StringUtil.wrapBlank(SqlKeyword.FROM.getKeyword())).append(StringUtil.wrapBlank(tableName));
         return builder.toString();
     }
 }

@@ -1,7 +1,5 @@
 package com.imitationsql.expression;
 
-import cn.hutool.core.util.StrUtil;
-import com.imitationsql.annotation.TableName;
 import com.imitationsql.util.TypeConvertUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,23 +38,6 @@ public abstract class AbstractSqlExpression<T> implements SqlExpression<T> {
      */
     protected String getTableName() {
         return getTableName(getEntityClass());
-    }
-
-    /**
-     * 获取表名
-     *
-     * @param entityClass
-     * @return
-     */
-    protected String getTableName(Class<?> entityClass) {
-        TableName annotation = getEntityClass().getAnnotation(TableName.class);
-        String tableName;
-        if (null == annotation) {
-            tableName = StrUtil.toUnderlineCase(entityClass.getSimpleName());
-        } else {
-            tableName = annotation.value();
-        }
-        return tableName;
     }
 
     /**

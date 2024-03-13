@@ -2,9 +2,11 @@ package com.imitationsql.expression;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import com.imitationsql.enums.SqlKeyword;
 import com.imitationsql.filter.GroupByFilter;
 import com.imitationsql.filter.Property;
 import com.imitationsql.util.LambdaUtil;
+import com.imitationsql.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +42,7 @@ public class GroupByExpression<T> implements SqlExpression<T> {
         if (CollUtil.isEmpty(this.groupByFilterList)) {
             return "";
         }
-        StringBuilder builder = new StringBuilder(" group by ");
+        StringBuilder builder = new StringBuilder(StringUtil.wrapBlank(SqlKeyword.GROUP_BY.getKeyword()));
         groupByFilterList.forEach(item -> {
             builder.append(item.getColumnName()).append(",");
         });

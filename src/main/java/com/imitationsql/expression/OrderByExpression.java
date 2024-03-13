@@ -2,9 +2,11 @@ package com.imitationsql.expression;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import com.imitationsql.enums.SqlKeyword;
 import com.imitationsql.filter.OrderByFilter;
 import com.imitationsql.filter.Property;
 import com.imitationsql.util.LambdaUtil;
+import com.imitationsql.util.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -69,9 +71,9 @@ public class OrderByExpression<T> implements SqlExpression<T> {
         if (CollUtil.isEmpty(this.orderByFilterList)) {
             return "";
         }
-        StringBuilder builder = new StringBuilder(" order by ");
+        StringBuilder builder = new StringBuilder(StringUtil.wrapBlank(SqlKeyword.ORDER_BY.getKeyword()));
         orderByFilterList.forEach(item -> {
-            builder.append(item.getColumnName()).append(item.isAsc() ? " asc " : " desc ").append(",");
+            builder.append(item.getColumnName()).append(item.isAsc() ? StringUtil.wrapBlank(SqlKeyword.ASC.getKeyword()) : StringUtil.wrapBlank(SqlKeyword.DESC.getKeyword())).append(",");
         });
         return builder.substring(0, builder.lastIndexOf(","));
     }

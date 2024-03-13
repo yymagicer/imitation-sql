@@ -30,4 +30,14 @@ public class SqlBuilderTest {
         String sql = sqlBuilder.select().where(o -> o.and(UserEntity::getUserName, "11").and(UserEntity::getPassword, "1234")).groupBy(o -> o.groupBy(UserEntity::getUserName)).orderBy(o -> o.asc(UserEntity::getUserName)).buildSql();
         System.out.println(sql);
     }
+
+    @Test
+    public void testSelectLeftJoin() {
+        SqlBuilder<UserEntity> sqlBuilder = new SqlBuilder<>(UserEntity.class);
+        String sql = sqlBuilder.select().leftJoin(o -> o.eq(UserRoleEntity.class, UserEntity::getId, UserRoleEntity::getUserId))
+                .innerJoin(o -> o.eq(UserRoleEntity.class, RoleEntity.class, UserRoleEntity::getRoleId, RoleEntity::getId))
+                .where(o -> o.and(UserEntity::getUserName, "11").and(UserRoleEntity.class, UserRoleEntity::getRoleId, "1")).buildSql();
+        System.out.println(sql);
+    }
+
 }
