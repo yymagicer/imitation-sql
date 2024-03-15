@@ -41,10 +41,24 @@ public class WhereExpression<T> implements SqlExpression<T> {
     /**
      * and查询
      *
+     * @param columnName
+     * @param val
+     * @param <P>
+     * @param <V>
+     * @return
+     */
+    public <P, V> WhereExpression<T> and(String columnName, V val) {
+        return and(columnName, OperateEnum.EQ, val, OperateEnum.AND);
+    }
+
+
+    /**
+     * and查询
+     *
      * @return
      */
     public WhereExpression<T> and() {
-        return and(null, OperateEnum.AND, null, null);
+        return and((Property<?, Object>) null, OperateEnum.AND, null, null);
     }
 
 
@@ -54,7 +68,7 @@ public class WhereExpression<T> implements SqlExpression<T> {
      * @return
      */
     public WhereExpression<T> or() {
-        return and(null, OperateEnum.OR, null, null);
+        return and((Property<?, Object>) null, OperateEnum.OR, null, null);
     }
 
 
@@ -64,7 +78,7 @@ public class WhereExpression<T> implements SqlExpression<T> {
      * @return
      */
     public WhereExpression<T> end() {
-        return and(null, OperateEnum.END, null, null);
+        return and((Property<?, Object>) null, OperateEnum.END, null, null);
     }
 
     /**
@@ -124,6 +138,30 @@ public class WhereExpression<T> implements SqlExpression<T> {
         } else {
             FilterNode<WhereFilter<T>, T> l = this.lastNode;
             FilterNode<WhereFilter<T>, T> node = new FilterNode<>(null, new WhereFilter<>(LambdaUtil.getFullPropertyName(column), operateEnum, val), expressionOperateEnum);
+            l.setNext(node);
+            this.lastNode = node;
+        }
+        return this;
+    }
+
+
+    /**
+     * and查询
+     *
+     * @param operateEnum
+     * @param val
+     * @param <P>
+     * @param <V>
+     * @return
+     */
+    public <P, V> WhereExpression<T> and(String columnName, OperateEnum operateEnum, V val, OperateEnum expressionOperateEnum) {
+        if (this.filterNode == null) {
+            FilterNode<WhereFilter<T>, T> node = new FilterNode<>(null, new WhereFilter<>(columnName, operateEnum, val), expressionOperateEnum);
+            this.filterNode = node;
+            this.lastNode = node;
+        } else {
+            FilterNode<WhereFilter<T>, T> l = this.lastNode;
+            FilterNode<WhereFilter<T>, T> node = new FilterNode<>(null, new WhereFilter<>(columnName, operateEnum, val), expressionOperateEnum);
             l.setNext(node);
             this.lastNode = node;
         }
