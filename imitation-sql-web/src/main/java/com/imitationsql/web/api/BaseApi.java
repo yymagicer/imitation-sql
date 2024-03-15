@@ -2,8 +2,11 @@ package com.imitationsql.web.api;
 
 import com.imitationsql.web.domain.BaseEntity;
 import com.imitationsql.web.domain.CommonResult;
+import com.imitationsql.web.domain.Page;
+import com.imitationsql.web.domain.QueryPage;
 import com.imitationsql.web.service.JdbcService;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.Serializable;
@@ -29,6 +32,13 @@ public class BaseApi<T extends BaseEntity> {
     public CommonResult<T> detail(@PathVariable(name = "id") Serializable id) {
         CommonResult<T> result = new CommonResult<>();
         result.setData(jdbcService.detail(this.entityClass, id));
+        return result;
+    }
+
+    @ResponseBody
+    public CommonResult<Page<T>> pageQuery(@RequestBody QueryPage page) {
+        CommonResult<Page<T>> result = new CommonResult<>();
+        result.setData(jdbcService.pageQuery(this.entityClass, page));
         return result;
     }
 }

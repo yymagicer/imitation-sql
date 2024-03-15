@@ -16,6 +16,8 @@ public class SqlBuilder<T> {
 
     private SelectExpression<T> selectExpression;
 
+    private CountExpression<T> countExpression;
+
     private WhereExpression<T> whereExpression;
 
     private OrderByExpression<T> orderByExpression;
@@ -42,6 +44,15 @@ public class SqlBuilder<T> {
             this.selectExpression = new SelectExpression<T>();
             this.selectExpression.setEntityClass(entityClass);
             next(this.selectExpression);
+        }
+        return this;
+    }
+
+    public SqlBuilder<T> count() {
+        if (null == this.countExpression) {
+            this.countExpression = new CountExpression<>();
+            this.countExpression.setEntityClass(entityClass);
+            next(this.countExpression);
         }
         return this;
     }
@@ -210,5 +221,18 @@ public class SqlBuilder<T> {
             nextNode = nextNode.getNextNode();
         }
         return builder.toString();
+    }
+
+    /**
+     * 清除
+     */
+    public void clear() {
+        this.selectExpression = null;
+        this.countExpression = null;
+        this.whereExpression = null;
+        this.orderByExpression = null;
+        this.groupByExpression = null;
+        this.sqlNode = null;
+        this.last = null;
     }
 }

@@ -15,10 +15,14 @@ import java.io.Serializable;
 @Setter
 @Getter
 public class BaseEntity {
-
     /**
      * id
      */
     @PrimaryKey
     private Serializable id;
+
+    /**
+     * 是否删除
+     */
+    private Integer deleted;
 }

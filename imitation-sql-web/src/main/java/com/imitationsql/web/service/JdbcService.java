@@ -37,11 +37,12 @@ public interface JdbcService {
     /**
      * 分页查询
      *
+     * @param entityClass
      * @param queryPage
      * @param <T>
      * @return
      */
-    <T extends BaseEntity> Page<T> pageQuery(QueryPage queryPage);
+    <T extends BaseEntity> Page<T> pageQuery(Class<T> entityClass, QueryPage queryPage);
 
     /**
      * 新增

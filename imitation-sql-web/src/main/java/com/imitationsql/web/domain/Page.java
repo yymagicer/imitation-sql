@@ -34,4 +34,20 @@ public class Page<T> {
      */
     protected long current = 1;
 
+    /**
+     * 获取总页数
+     *
+     * @return
+     */
+    public long getPages() {
+        if (getSize() == 0) {
+            return 0L;
+        }
+        long pages = getTotal() / getSize();
+        if (getTotal() % getSize() != 0) {
+            pages++;
+        }
+        return pages;
+    }
+
 }

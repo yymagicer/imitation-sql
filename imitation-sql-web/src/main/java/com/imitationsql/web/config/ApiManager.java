@@ -3,6 +3,7 @@ package com.imitationsql.web.config;
 import cn.hutool.core.util.StrUtil;
 import com.imitationsql.web.api.BaseApi;
 import com.imitationsql.web.domain.BaseEntity;
+import com.imitationsql.web.domain.QueryPage;
 import com.imitationsql.web.service.JdbcService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -64,7 +66,7 @@ public class ApiManager implements InitializingBean, ApplicationContextAware {
             //注册详情方法
             registerDetailMethod(entityClass, baseApi);
             //注册分页查询方法
-//            registerPageQueryMethod(entityClass);
+            registerPageQueryMethod(entityClass, baseApi);
             //注册列表查询方法
 //            registerListQueryMethod(entityClass);
             //注册新增方法
@@ -97,8 +99,12 @@ public class ApiManager implements InitializingBean, ApplicationContextAware {
      *
      * @param entityClass
      */
-    private void registerPageQueryMethod(Class<?> entityClass) {
-
+    private void registerPageQueryMethod(Class<?> entityClass, BaseApi<BaseEntity> baseApi) {
+        String url = "/" + StrUtil.lowerFirst(entityClass.getSimpleName()).replace("Entity", "") + "/" + "list";
+        RequestMethod requestMethod = RequestMethod.POST;
+        log.info("{},{}", requestMethod.name(), url);
+        Method method = ReflectionUtils.findMethod(baseApi.getClass(), "pageQuery", QueryPage.class);
+        register2Spring(baseApi, url, requestMethod, method, MediaType.APPLICATION_JSON_VALUE);
     }
 
     /**
