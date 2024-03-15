@@ -79,7 +79,7 @@ public class DefaultJdbcServiceImpl implements JdbcService {
             return page;
         }
         sqlBuilder.clear();
-        String sql = sqlBuilder.select().where(o -> getWhereExpression(o, fields, queryEntity)).buildSql();
+        String sql = sqlBuilder.select().where(o -> getWhereExpression(o, fields, queryEntity)).limit(o -> o.limit(queryPage.getOffset(), queryPage.getSize())).buildSql();
         List<T> records = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(entityClass));
         page.setRecords(records);
         return page;

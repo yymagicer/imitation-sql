@@ -3,6 +3,7 @@ package com.imitationsql.core;
 import com.imitationsql.core.expression.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * <p>Description: sql生成器 </p>
@@ -12,6 +13,7 @@ import lombok.Setter;
  */
 @Setter
 @Getter
+@Slf4j
 public class SqlBuilder<T> {
 
     private SelectExpression<T> selectExpression;
@@ -23,6 +25,8 @@ public class SqlBuilder<T> {
     private OrderByExpression<T> orderByExpression;
 
     private GroupByExpression<T> groupByExpression;
+
+    private LimitExpression<T> limitExpression;
 
     private Class<T> entityClass;
     /**
@@ -127,6 +131,21 @@ public class SqlBuilder<T> {
         return this;
     }
 
+    /**
+     * limit
+     *
+     * @param expression
+     * @return
+     */
+    public SqlBuilder<T> limit(Expression<LimitExpression<T>> expression) {
+        if (null == this.limitExpression) {
+            this.limitExpression = new LimitExpression<>();
+            next(limitExpression);
+        }
+        expression.apply(this.limitExpression);
+        return this;
+    }
+
 
     /**
      * group by
@@ -220,7 +239,11 @@ public class SqlBuilder<T> {
             builder.append(nextNode.getExpression().sql());
             nextNode = nextNode.getNextNode();
         }
-        return builder.toString();
+        String sql = builder.toString();
+        if (log.isDebugEnabled()) {
+            log.debug(sql);
+        }
+        return sql;
     }
 
     /**

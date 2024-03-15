@@ -24,4 +24,9 @@ public class QueryPage extends HashMap<String, Object> {
      * 当前的页数
      */
     private long pageNum;
+
+
+    public long getOffset() {
+        return pageNum * size;
+    }
 }
