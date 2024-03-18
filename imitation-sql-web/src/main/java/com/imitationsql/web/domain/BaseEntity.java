@@ -1,6 +1,7 @@
 package com.imitationsql.web.domain;
 
 import com.imitationsql.core.annotation.PrimaryKey;
+import com.imitationsql.core.constants.BaseEntityConstant;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,5 +25,5 @@ public class BaseEntity {
     /**
      * 是否删除
      */
-    private Integer deleted;
+    private Integer deleted = BaseEntityConstant.NOT_DELETE;
 }

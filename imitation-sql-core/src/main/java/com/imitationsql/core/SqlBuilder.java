@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 /**
  * <p>Description: sql生成器 </p>
  *
@@ -28,6 +30,8 @@ public class SqlBuilder<T> {
 
     private LimitExpression<T> limitExpression;
 
+    private InsertExpression<T> insertExpression;
+
     private Class<T> entityClass;
     /**
      * sql节点
@@ -41,6 +45,33 @@ public class SqlBuilder<T> {
 
     public SqlBuilder(Class<T> entityClass) {
         this.entityClass = entityClass;
+    }
+
+    /**
+     * 新增
+     *
+     * @param entity
+     * @return
+     */
+    public SqlBuilder<T> insert(T entity) {
+        this.insertExpression = new InsertExpression<>();
+        this.insertExpression.setEntity(entity);
+        next(this.insertExpression);
+        return this;
+    }
+
+    /**
+     * 批量新增
+     *
+     * @param entitys
+     * @return
+     */
+    public SqlBuilder<T> batchInsert(List<T> entitys) {
+        this.insertExpression = new InsertExpression<>();
+        this.insertExpression.setEntity(entitys);
+        this.insertExpression.setBatch(true);
+        next(this.insertExpression);
+        return this;
     }
 
     public SqlBuilder<T> select() {

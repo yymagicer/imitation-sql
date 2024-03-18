@@ -1,6 +1,7 @@
 package com.imitationsql.core.util;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 
 import java.util.Date;
 
@@ -28,8 +29,8 @@ public class TypeConvertUtil {
         }
         //转换时间类型
         if (data instanceof Date) {
-            return DateUtil.formatDateTime((Date) data);
+            return StrUtil.wrap(DateUtil.formatDateTime((Date) data), "'");
         }
-        return data.toString();
+        return StrUtil.wrap(data.toString(), "'");
     }
 }

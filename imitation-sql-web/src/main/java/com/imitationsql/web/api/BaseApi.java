@@ -1,5 +1,6 @@
 package com.imitationsql.web.api;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.imitationsql.web.domain.BaseEntity;
 import com.imitationsql.web.domain.CommonResult;
 import com.imitationsql.web.domain.Page;
@@ -19,9 +20,9 @@ import java.io.Serializable;
  */
 public class BaseApi<T extends BaseEntity> {
 
-    private JdbcService jdbcService;
+    private final JdbcService jdbcService;
 
-    private Class<T> entityClass;
+    private final Class<T> entityClass;
 
     public BaseApi(JdbcService jdbcService, Class<T> entityClass) {
         this.jdbcService = jdbcService;
@@ -39,6 +40,13 @@ public class BaseApi<T extends BaseEntity> {
     public CommonResult<Page<T>> pageQuery(@RequestBody QueryPage page) {
         CommonResult<Page<T>> result = new CommonResult<>();
         result.setData(jdbcService.pageQuery(this.entityClass, page));
+        return result;
+    }
+
+    @ResponseBody
+    public CommonResult<T> insert(@RequestBody Object entity) {
+        CommonResult<T> result = new CommonResult<>();
+        result.setData(jdbcService.insert(BeanUtil.toBean(entity, this.entityClass)));
         return result;
     }
 }

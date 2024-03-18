@@ -1,14 +1,16 @@
 package com.imitationsql.core.expression;
 
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.StrUtil;
+import com.imitationsql.core.annotation.PrimaryKey;
+import com.imitationsql.core.enums.IdType;
 import com.imitationsql.core.util.TypeConvertUtil;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>Description: some description </p>
@@ -63,13 +65,29 @@ public abstract class AbstractSqlExpression<T> implements SqlExpression<T> {
      * @return
      */
     protected Map<String, String> getFieldMap(Object object) {
-        Field[] fields = object.getClass().getFields();
+        Field[] fields = ReflectUtil.getFields(object.getClass());
         Map<String, String> fieldMap = new HashMap<>();
         for (Field field : fields) {
             field.setAccessible(true);
             try {
                 Object fieldValue = field.get(object);
-                fieldMap.put(field.getName(), TypeConvertUtil.simpleConvert(fieldValue));
+                PrimaryKey primaryKey = field.getAnnotation(PrimaryKey.class);
+                if (primaryKey != null) {
+
+                    if (!IdType.AUTO.equals(primaryKey.type())) {
+                        if (IdType.ASSIGN_SNOWFLAKE_ID.equals(primaryKey.type())) {
+                            if (null == fieldValue) {
+                                fieldValue = IdUtil.getSnowflake().nextId();
+                            }
+                        } else if (IdType.ASSIGN_UUID.equals(primaryKey.type())) {
+                            fieldValue = IdUtil.fastUUID();
+                        }
+                        fieldMap.put(field.getName(), TypeConvertUtil.simpleConvert(fieldValue));
+                    }
+                } else {
+                    fieldMap.put(field.getName(), TypeConvertUtil.simpleConvert(fieldValue));
+                }
+
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
@@ -86,8 +104,13 @@ public abstract class AbstractSqlExpression<T> implements SqlExpression<T> {
      */
     protected List<String> getFieldValues(List<String> columns, Object object) {
         List<String> values = new ArrayList<>();
+        Map<String, String> fieldMap = getFieldMap(object);
+        Set<String> keySet = fieldMap.keySet();
         for (String column : columns) {
-            values.add(getFieldMap(object).get(column));
+            String fieldName = StrUtil.toCamelCase(column);
+            if (keySet.contains(fieldName)) {
+                values.add(getFieldMap(object).get(fieldName));
+            }
         }
         return values;
     }

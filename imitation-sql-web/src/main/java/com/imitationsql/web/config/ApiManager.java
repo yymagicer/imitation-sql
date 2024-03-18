@@ -20,6 +20,8 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
 /**
  * <p>Description: api管理器 </p>
@@ -60,7 +62,7 @@ public class ApiManager implements InitializingBean, ApplicationContextAware {
         String[] autoApiNames = applicationContext.getBeanNamesForAnnotation(EnableAutoApi.class);
         for (String autoApiName : autoApiNames) {
             Object bean = applicationContext.getBean(autoApiName);
-            BaseApi<BaseEntity> baseApi = new BaseApi<>(jdbcService, (Class<BaseEntity>) bean.getClass());
+            BaseApi<?> baseApi = new BaseApi<>(jdbcService, (Class<BaseEntity>) bean.getClass());
             Class<?> entityClass = bean.getClass();
             log.info("开始注册 {} api 接口", entityClass.getSimpleName());
             //注册详情方法
@@ -70,7 +72,7 @@ public class ApiManager implements InitializingBean, ApplicationContextAware {
             //注册列表查询方法
 //            registerListQueryMethod(entityClass);
             //注册新增方法
-//            registerInsertMethod(entityClass);
+            registerInsertMethod(entityClass, baseApi);
             //注册更新方法
 //            registerUpdateMethod(entityClass);
             //注册删除方法
@@ -85,7 +87,7 @@ public class ApiManager implements InitializingBean, ApplicationContextAware {
      *
      * @param entityClass
      */
-    private void registerDetailMethod(Class<?> entityClass, BaseApi<BaseEntity> baseApi) {
+    private void registerDetailMethod(Class<?> entityClass, BaseApi<? extends BaseEntity> baseApi) {
         String url = "/" + StrUtil.lowerFirst(entityClass.getSimpleName()).replace("Entity", "") + "/" + "detail/{id}";
         RequestMethod requestMethod = RequestMethod.GET;
         log.info("{},{}", requestMethod.name(), url);
@@ -99,8 +101,8 @@ public class ApiManager implements InitializingBean, ApplicationContextAware {
      *
      * @param entityClass
      */
-    private void registerPageQueryMethod(Class<?> entityClass, BaseApi<BaseEntity> baseApi) {
-        String url = "/" + StrUtil.lowerFirst(entityClass.getSimpleName()).replace("Entity", "") + "/" + "list";
+    private void registerPageQueryMethod(Class<?> entityClass, BaseApi<? extends BaseEntity> baseApi) {
+        String url = "/" + StrUtil.lowerFirst(entityClass.getSimpleName()).replace("Entity", "") + "/" + "page";
         RequestMethod requestMethod = RequestMethod.POST;
         log.info("{},{}", requestMethod.name(), url);
         Method method = ReflectionUtils.findMethod(baseApi.getClass(), "pageQuery", QueryPage.class);
@@ -121,8 +123,12 @@ public class ApiManager implements InitializingBean, ApplicationContextAware {
      *
      * @param entityClass
      */
-    private void registerInsertMethod(Class<?> entityClass) {
-
+    private void registerInsertMethod(Class<?> entityClass, BaseApi<? extends BaseEntity> baseApi) {
+        String url = "/" + StrUtil.lowerFirst(entityClass.getSimpleName()).replace("Entity", "");
+        RequestMethod requestMethod = RequestMethod.POST;
+        log.info("{},{}", requestMethod.name(), url);
+        Method method = ReflectionUtils.findMethod(baseApi.getClass(), "insert", Object.class);
+        register2Spring(baseApi, url, requestMethod, method, MediaType.APPLICATION_JSON_VALUE);
     }
 
     /**

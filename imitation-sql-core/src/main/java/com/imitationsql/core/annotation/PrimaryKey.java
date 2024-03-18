@@ -1,5 +1,7 @@
 package com.imitationsql.core.annotation;
 
+import com.imitationsql.core.enums.IdType;
+
 import java.lang.annotation.*;
 
 /**
@@ -19,4 +21,14 @@ public @interface PrimaryKey {
      * @return
      */
     String value() default "id";
+
+
+    /**
+     * 主键id类型，默认数据库ID自增
+     *
+     * @return
+     */
+    IdType type() default IdType.AUTO;
+
+
 }

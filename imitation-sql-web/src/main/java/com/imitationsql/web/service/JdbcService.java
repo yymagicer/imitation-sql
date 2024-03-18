@@ -56,12 +56,12 @@ public interface JdbcService {
     /**
      * 更新
      *
+     * @param entityClass
      * @param entity
-     * @param id
      * @param <T>
      * @return
      */
-    <T extends BaseEntity> T update(T entity, Serializable id);
+    <T extends BaseEntity> T update(Class<T> entityClass, T entity);
 
     /**
      * 删除

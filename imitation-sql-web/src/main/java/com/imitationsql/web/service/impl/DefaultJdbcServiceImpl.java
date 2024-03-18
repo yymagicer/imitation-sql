@@ -85,7 +85,15 @@ public class DefaultJdbcServiceImpl implements JdbcService {
         return page;
     }
 
-    private <T extends BaseEntity> WhereExpression<T> getWhereExpression(WhereExpression<T> whereExpression, Field[] fields, T entity) {
+    /**
+     * 构造where表达式
+     *
+     * @param whereExpression
+     * @param fields
+     * @param entity
+     * @param <T>
+     */
+    private <T extends BaseEntity> void getWhereExpression(WhereExpression<T> whereExpression, Field[] fields, T entity) {
         whereExpression.and(BaseEntityConstant.DELETED_FIELD, BaseEntityConstant.NOT_DELETE);
         for (Field field : fields) {
             field.setAccessible(true);
@@ -98,16 +106,22 @@ public class DefaultJdbcServiceImpl implements JdbcService {
                 throw new RuntimeException(e);
             }
         }
-        return whereExpression;
     }
 
     @Override
     public <T extends BaseEntity> T insert(T entity) {
+        SqlBuilder<T> sqlBuilder = (SqlBuilder<T>) new SqlBuilder<>(entity.getClass());
+        sqlBuilder.insert(entity);
+        if (jdbcTemplate.update(sqlBuilder.buildSql()) > 0) {
+            Serializable id = jdbcTemplate.queryForObject(BaseEntityConstant.QUERY_LASTINSERT_ID, Serializable.class);
+            entity.setId(id);
+            return entity;
+        }
         return null;
     }
 
     @Override
-    public <T extends BaseEntity> T update(T entity, Serializable id) {
+    public <T extends BaseEntity> T update(Class<T> entityClass, T entity) {
         return null;
     }
 
