@@ -1,7 +1,6 @@
 package com.imitationsql.web.domain;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.imitationsql.core.constants.CommonConstant;
 
 import java.util.HashMap;
 
@@ -11,22 +10,19 @@ import java.util.HashMap;
  * @author : xiaodong.yang
  * @date : 2024/3/15 11:33
  */
-@Setter
-@Getter
 public class QueryPage extends HashMap<String, Object> {
 
-    /**
-     * 每页显示条数，默认 10
-     */
-    private long size = 10;
+    public long getPageSize() {
+        Object pageSize = get(CommonConstant.PAGE_SIZE);
+        return null == pageSize ? 10 : Long.parseLong(pageSize.toString());
+    }
 
-    /**
-     * 当前的页数
-     */
-    private long pageNum;
-
+    public long getPageNum() {
+        Object pageNum = get(CommonConstant.PAGE_NUM);
+        return null == pageNum ? 1 : Long.parseLong(pageNum.toString());
+    }
 
     public long getOffset() {
-        return pageNum * size;
+        return (getPageNum() - 1) * getPageSize();
     }
 }

@@ -11,8 +11,13 @@ import lombok.Setter;
  */
 @Setter
 @Getter
-public class UpdateExpression extends AbstractSqlExpression {
+public class UpdateExpression<T> extends AbstractSqlExpression<T> {
 
+
+
+    public UpdateExpression<T> updateById(T entity) {
+        return this;
+    }
 
     @Override
     public String sql() {

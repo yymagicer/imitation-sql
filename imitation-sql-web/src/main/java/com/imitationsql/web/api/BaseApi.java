@@ -39,7 +39,7 @@ public class BaseApi<T extends BaseEntity> {
     @ResponseBody
     public CommonResult<Page<T>> pageQuery(@RequestBody QueryPage page) {
         CommonResult<Page<T>> result = new CommonResult<>();
-        result.setData(jdbcService.pageQuery(this.entityClass, page));
+        result.setData(jdbcService.pageQuery(this.entityClass, BeanUtil.toBean(page, QueryPage.class)));
         return result;
     }
 

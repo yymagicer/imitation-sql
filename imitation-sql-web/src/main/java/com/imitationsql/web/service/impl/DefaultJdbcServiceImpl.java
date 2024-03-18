@@ -74,12 +74,12 @@ public class DefaultJdbcServiceImpl implements JdbcService {
         Long count = jdbcTemplate.queryForObject(countSql, Long.class);
         page.setTotal(count);
         page.setCurrent(queryPage.getPageNum());
-        page.setSize(queryPage.getSize());
+        page.setSize(queryPage.getPageSize());
         if (queryPage.getPageNum() > page.getPages()) {
             return page;
         }
         sqlBuilder.clear();
-        String sql = sqlBuilder.select().where(o -> getWhereExpression(o, fields, queryEntity)).limit(o -> o.limit(queryPage.getOffset(), queryPage.getSize())).buildSql();
+        String sql = sqlBuilder.select().where(o -> getWhereExpression(o, fields, queryEntity)).limit(o -> o.limit(queryPage.getOffset(), queryPage.getPageSize())).buildSql();
         List<T> records = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(entityClass));
         page.setRecords(records);
         return page;
