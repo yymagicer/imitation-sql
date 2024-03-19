@@ -1,6 +1,8 @@
 package com.imitationsql.web.entity;
 
+import com.imitationsql.core.annotation.Query;
 import com.imitationsql.core.annotation.TableName;
+import com.imitationsql.core.enums.OperateEnum;
 import com.imitationsql.web.config.EnableAutoApi;
 import com.imitationsql.web.domain.BaseEntity;
 import lombok.Getter;
@@ -18,6 +20,7 @@ import lombok.Setter;
 @EnableAutoApi
 public class UserEntity extends BaseEntity {
 
+    @Query(operate = OperateEnum.LIKE)
     private String userName;
 
     private String password;

@@ -1,5 +1,7 @@
 package com.imitationsql.core.annotation;
 
+import com.imitationsql.core.enums.OperateEnum;
+
 import java.lang.annotation.*;
 
 /**
@@ -12,4 +14,11 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Query {
+
+    /**
+     * 操作，默认 eq查询
+     *
+     * @return
+     */
+    OperateEnum operate() default OperateEnum.EQ;
 }

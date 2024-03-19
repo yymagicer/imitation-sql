@@ -48,7 +48,6 @@ public class ApiManager implements InitializingBean, ApplicationContextAware {
         boolean status = true;
         try {
             requestMappingHandlerMapping.registerMapping(requestMappingInfo, baseApi, method);
-            log.info("【接口注册成功】{}", path);
         } catch (Exception e) {
             status = false;
             log.error("【注册接口异常】动态映射失败", e);
@@ -63,7 +62,6 @@ public class ApiManager implements InitializingBean, ApplicationContextAware {
             Object bean = applicationContext.getBean(autoApiName);
             BaseApi<?> baseApi = new BaseApi<>(jdbcService, (Class<BaseEntity>) bean.getClass());
             Class<?> entityClass = bean.getClass();
-            log.info("开始注册 {} api 接口", entityClass.getSimpleName());
             //注册详情方法
             registerDetailMethod(entityClass, baseApi);
             //注册分页查询方法

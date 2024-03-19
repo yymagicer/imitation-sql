@@ -101,6 +101,19 @@ public class WhereExpression<T> implements SqlExpression<T> {
         return and(columnName, OperateEnum.EQ, val, OperateEnum.AND);
     }
 
+    /**
+     * and查询
+     *
+     * @param columnName
+     * @param operateEnum
+     * @param val
+     * @param <P>
+     * @param <V>
+     * @return
+     */
+    public <P, V> WhereExpression<T> and(String columnName, OperateEnum operateEnum, V val) {
+        return and(columnName, operateEnum, val, OperateEnum.AND);
+    }
 
     /**
      * and查询
@@ -254,6 +267,8 @@ public class WhereExpression<T> implements SqlExpression<T> {
             if (filter.getOperateEnum().equals(OperateEnum.IN) || filter.getOperateEnum().equals(OperateEnum.NOT_IN)) {
                 List<Object> list = (List<Object>) filter.getVal();
                 builder.append(StringUtil.wrapBlank(StrUtil.toUnderlineCase(filter.getPropertyName()))).append(StringUtil.wrapBlank(filter.getOperateEnum().getType())).append("(").append(getString(list)).append(")");
+            } else if (filter.getOperateEnum().equals(OperateEnum.LIKE)) {
+                builder.append(StringUtil.wrapBlank(StrUtil.toUnderlineCase(filter.getPropertyName()))).append(StringUtil.wrapBlank(filter.getOperateEnum().getType())).append(StrUtil.wrap(filter.getVal().toString().replace("'", ""), "'%", "%'"));
             } else {
                 builder.append(StringUtil.wrapBlank(StrUtil.toUnderlineCase(filter.getPropertyName()))).append(StringUtil.wrapBlank(filter.getOperateEnum().getType())).append(filter.getVal());
             }
@@ -274,6 +289,8 @@ public class WhereExpression<T> implements SqlExpression<T> {
                 if (nextFilter.getOperateEnum().equals(OperateEnum.IN) || nextFilter.getOperateEnum().equals(OperateEnum.NOT_IN)) {
                     List<Object> list = (List<Object>) nextFilter.getVal();
                     builder.append(StringUtil.wrapBlank(StrUtil.toUnderlineCase(nextFilter.getPropertyName()))).append(StringUtil.wrapBlank(nextFilter.getOperateEnum().getType())).append("(").append(getString(list)).append(")");
+                } else if (nextFilter.getOperateEnum().equals(OperateEnum.LIKE)) {
+                    builder.append(StringUtil.wrapBlank(StrUtil.toUnderlineCase(nextFilter.getPropertyName()))).append(StringUtil.wrapBlank(nextFilter.getOperateEnum().getType())).append(StrUtil.wrap(nextFilter.getVal().toString().replace("'", ""), "'%", "%'"));
                 } else {
                     builder.append(StringUtil.wrapBlank(StrUtil.toUnderlineCase(nextFilter.getPropertyName()))).append(StringUtil.wrapBlank(nextFilter.getOperateEnum().getType())).append(nextFilter.getVal());
                 }
@@ -287,6 +304,6 @@ public class WhereExpression<T> implements SqlExpression<T> {
         if (CollUtil.isEmpty(list)) {
             return "";
         }
-         return list.stream().map(TypeConvertUtil::simpleConvert).collect(Collectors.joining(","));
+        return list.stream().map(TypeConvertUtil::simpleConvert).collect(Collectors.joining(","));
     }
 }

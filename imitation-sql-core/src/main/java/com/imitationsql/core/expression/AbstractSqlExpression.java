@@ -84,9 +84,11 @@ public abstract class AbstractSqlExpression<T> implements SqlExpression<T> {
                         if (IdType.ASSIGN_SNOWFLAKE_ID.equals(primaryKey.type())) {
                             if (null == fieldValue) {
                                 fieldValue = IdUtil.getSnowflake().nextId();
+                                field.set(object, fieldValue);
                             }
                         } else if (IdType.ASSIGN_UUID.equals(primaryKey.type())) {
                             fieldValue = IdUtil.fastUUID();
+                            field.set(object, fieldValue);
                         }
                         fieldMap.put(field.getName(), TypeConvertUtil.simpleConvert(fieldValue));
                     }

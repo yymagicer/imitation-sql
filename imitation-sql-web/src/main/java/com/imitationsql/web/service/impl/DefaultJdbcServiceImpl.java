@@ -5,6 +5,7 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.imitationsql.core.SqlBuilder;
 import com.imitationsql.core.annotation.PrimaryKey;
+import com.imitationsql.core.annotation.Query;
 import com.imitationsql.core.constants.BaseEntityConstant;
 import com.imitationsql.core.enums.OperateEnum;
 import com.imitationsql.core.expression.UpdateExpression;
@@ -103,11 +104,15 @@ public class DefaultJdbcServiceImpl implements JdbcService {
     private <T extends BaseEntity> void getWhereExpression(WhereExpression<T> whereExpression, Field[] fields, T entity) {
         whereExpression.and(BaseEntityConstant.DELETED_FIELD, BaseEntityConstant.NOT_DELETE);
         for (Field field : fields) {
+            Query query = field.getAnnotation(Query.class);
+            if (query == null) {
+                continue;
+            }
             field.setAccessible(true);
             try {
                 Object fieldValue = field.get(entity);
                 if (null != fieldValue && StrUtil.isNotBlank(fieldValue.toString())) {
-                    whereExpression.and(StringUtil.wrapBlank(StrUtil.toUnderlineCase(field.getName())), TypeConvertUtil.simpleConvert(fieldValue));
+                    whereExpression.and(StringUtil.wrapBlank(StrUtil.toUnderlineCase(field.getName())), query.operate(), TypeConvertUtil.simpleConvert(fieldValue));
                 }
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
@@ -121,8 +126,10 @@ public class DefaultJdbcServiceImpl implements JdbcService {
         SqlBuilder<T> sqlBuilder = (SqlBuilder<T>) new SqlBuilder<>(entity.getClass());
         sqlBuilder.insert(entity);
         if (jdbcTemplate.update(sqlBuilder.buildSql()) > 0) {
-            Serializable id = jdbcTemplate.queryForObject(BaseEntityConstant.QUERY_LASTINSERT_ID, Serializable.class);
-            entity.setId(id);
+            if (null == entity.getId()) {
+                Serializable id = jdbcTemplate.queryForObject(BaseEntityConstant.QUERY_LASTINSERT_ID, Serializable.class);
+                entity.setId(id);
+            }
             return entity;
         }
         return null;
