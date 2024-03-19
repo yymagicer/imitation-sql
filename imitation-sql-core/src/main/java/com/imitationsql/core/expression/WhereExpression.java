@@ -287,6 +287,6 @@ public class WhereExpression<T> implements SqlExpression<T> {
         if (CollUtil.isEmpty(list)) {
             return "";
         }
-        return list.stream().map(TypeConvertUtil::simpleConvert).collect(Collectors.joining(","));
+         return list.stream().map(TypeConvertUtil::simpleConvert).collect(Collectors.joining(","));
     }
 }
