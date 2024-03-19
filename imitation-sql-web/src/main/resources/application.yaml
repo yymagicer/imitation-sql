@@ -9,3 +9,12 @@ spring:
       maximum-pool-size: 5
       max-lifetime: 0
 
+
+
+logging:
+  level:
+    org:
+      springframework:
+        jdbc:
+          core:
+            JdbcTemplate: DEBUG

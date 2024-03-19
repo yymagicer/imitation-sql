@@ -6,7 +6,10 @@ import cn.hutool.core.util.StrUtil;
 import com.imitationsql.core.SqlBuilder;
 import com.imitationsql.core.annotation.PrimaryKey;
 import com.imitationsql.core.constants.BaseEntityConstant;
+import com.imitationsql.core.enums.OperateEnum;
+import com.imitationsql.core.expression.UpdateExpression;
 import com.imitationsql.core.expression.WhereExpression;
+import com.imitationsql.core.util.LambdaUtil;
 import com.imitationsql.core.util.StringUtil;
 import com.imitationsql.core.util.TypeConvertUtil;
 import com.imitationsql.web.domain.BaseEntity;
@@ -17,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -59,8 +63,11 @@ public class DefaultJdbcServiceImpl implements JdbcService {
     }
 
     @Override
-    public <T extends BaseEntity> List<T> list(T entity) {
-        return null;
+    public <T extends BaseEntity> List<T> list(Class<T> entityClass, T entity) {
+        SqlBuilder<T> sqlBuilder = new SqlBuilder<>(entityClass);
+        Field[] fields = ReflectUtil.getFields(entityClass);
+        String sql = sqlBuilder.select().where(o -> getWhereExpression(o, fields, entity)).buildSql();
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(entityClass));
     }
 
     @Override
@@ -109,6 +116,7 @@ public class DefaultJdbcServiceImpl implements JdbcService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public <T extends BaseEntity> T insert(T entity) {
         SqlBuilder<T> sqlBuilder = (SqlBuilder<T>) new SqlBuilder<>(entity.getClass());
         sqlBuilder.insert(entity);
@@ -121,17 +129,57 @@ public class DefaultJdbcServiceImpl implements JdbcService {
     }
 
     @Override
-    public <T extends BaseEntity> T update(Class<T> entityClass, T entity) {
-        return null;
+    public <T extends BaseEntity> boolean update(T entity) {
+        SqlBuilder<T> sqlBuilder = (SqlBuilder<T>) new SqlBuilder<>(entity.getClass());
+        Field[] fields = ReflectUtil.getFields(entity.getClass());
+        String tableName = LambdaUtil.getTableName(entity.getClass());
+        String updateSql = sqlBuilder.update().set(o -> getSetExpression(o, fields, entity)).where(o -> o.and(tableName, BaseEntity::getId, entity.getId())).buildSql();
+        return jdbcTemplate.update(updateSql) > 0;
+    }
+
+    private <T extends BaseEntity> void getSetExpression(UpdateExpression<T> updateExpression, Field[] fields, T entity) {
+        for (Field field : fields) {
+            field.setAccessible(true);
+            try {
+                Object fieldValue = field.get(entity);
+                if (null != fieldValue && StrUtil.isNotBlank(fieldValue.toString())) {
+                    updateExpression.set(StringUtil.wrapBlank(StrUtil.toUnderlineCase(field.getName())), TypeConvertUtil.simpleConvert(fieldValue));
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
     public <T extends BaseEntity> boolean delete(Class<T> entityClass, Serializable id) {
-        return false;
+        SqlBuilder<T> sqlBuilder = new SqlBuilder<>(entityClass);
+        String tableName = LambdaUtil.getTableName(entityClass);
+        String deleteSql = sqlBuilder.update().set(o -> o.set(tableName, BaseEntity::getDeleted, BaseEntityConstant.DELETED)).where(o -> o.and(tableName, BaseEntity::getId, id).and(tableName, BaseEntity::getDeleted, BaseEntityConstant.NOT_DELETE)).buildSql();
+        return jdbcTemplate.update(deleteSql) > 0;
     }
 
     @Override
     public <T extends BaseEntity, I extends Serializable> boolean batchDelete(Class<T> entityClass, List<I> ids) {
-        return false;
+        SqlBuilder<T> sqlBuilder = new SqlBuilder<>(entityClass);
+        String tableName = LambdaUtil.getTableName(entityClass);
+        String deleteSql = sqlBuilder.update().set(o -> o.set(tableName, BaseEntity::getDeleted, BaseEntityConstant.DELETED)).where(o -> o.and(tableName, BaseEntity::getId, OperateEnum.IN, ids).and(tableName, BaseEntity::getDeleted, BaseEntityConstant.NOT_DELETE)).buildSql();
+        return jdbcTemplate.update(deleteSql) > 0;
+    }
+
+    @Override
+    public <T extends BaseEntity> boolean physicalDelete(Class<T> entityClass, Serializable id) {
+        SqlBuilder<T> sqlBuilder = new SqlBuilder<>(entityClass);
+        String tableName = LambdaUtil.getTableName(entityClass);
+        String deleteSql = sqlBuilder.delete().where(o -> o.and(tableName, BaseEntity::getId, id)).buildSql();
+        return jdbcTemplate.update(deleteSql) > 0;
+    }
+
+    @Override
+    public <T extends BaseEntity, I extends Serializable> boolean physicalBatchDelete(Class<T> entityClass, List<I> ids) {
+        SqlBuilder<T> sqlBuilder = new SqlBuilder<>(entityClass);
+        String tableName = LambdaUtil.getTableName(entityClass);
+        String deleteSql = sqlBuilder.delete().where(o -> o.and(tableName, BaseEntity::getId, OperateEnum.IN, ids)).buildSql();
+        return jdbcTemplate.update(deleteSql) > 0;
     }
 }

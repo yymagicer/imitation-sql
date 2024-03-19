@@ -20,8 +20,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.util.List;
 
 /**
  * <p>Description: api管理器 </p>
@@ -70,15 +69,19 @@ public class ApiManager implements InitializingBean, ApplicationContextAware {
             //注册分页查询方法
             registerPageQueryMethod(entityClass, baseApi);
             //注册列表查询方法
-//            registerListQueryMethod(entityClass);
+            registerListQueryMethod(entityClass, baseApi);
             //注册新增方法
             registerInsertMethod(entityClass, baseApi);
             //注册更新方法
-//            registerUpdateMethod(entityClass);
+            registerUpdateMethod(entityClass, baseApi);
             //注册删除方法
-//            registerDeleteMethod(entityClass);
+            registerDeleteMethod(entityClass, baseApi);
             //注册批量删除方法
-//            registerBatchDeleteMethod(entityClass);
+            registerBatchDeleteMethod(entityClass, baseApi);
+            //注册物理删除方法
+            registerPhysicalDeleteMethod(entityClass, baseApi);
+            //注册物理批量删除方法
+            registerPhysicalBatchDeleteMethod(entityClass, baseApi);
         }
     }
 
@@ -114,14 +117,19 @@ public class ApiManager implements InitializingBean, ApplicationContextAware {
      *
      * @param entityClass
      */
-    private void registerListQueryMethod(Class<?> entityClass) {
-
+    private void registerListQueryMethod(Class<?> entityClass, BaseApi<?> baseApi) {
+        String url = "/" + StrUtil.lowerFirst(entityClass.getSimpleName()).replace("Entity", "") + "/" + "list";
+        RequestMethod requestMethod = RequestMethod.POST;
+        log.info("{},{}", requestMethod.name(), url);
+        Method method = ReflectionUtils.findMethod(baseApi.getClass(), "list", Object.class);
+        register2Spring(baseApi, url, requestMethod, method, MediaType.APPLICATION_JSON_VALUE);
     }
 
     /**
      * 注册新增方法
      *
      * @param entityClass
+     * @param baseApi
      */
     private void registerInsertMethod(Class<?> entityClass, BaseApi<? extends BaseEntity> baseApi) {
         String url = "/" + StrUtil.lowerFirst(entityClass.getSimpleName()).replace("Entity", "");
@@ -135,9 +143,14 @@ public class ApiManager implements InitializingBean, ApplicationContextAware {
      * 注册更新方法
      *
      * @param entityClass
+     * @param baseApi
      */
-    private void registerUpdateMethod(Class<?> entityClass) {
-
+    private void registerUpdateMethod(Class<?> entityClass, BaseApi<? extends BaseEntity> baseApi) {
+        String url = "/" + StrUtil.lowerFirst(entityClass.getSimpleName()).replace("Entity", "");
+        RequestMethod requestMethod = RequestMethod.PUT;
+        log.info("{},{}", requestMethod.name(), url);
+        Method method = ReflectionUtils.findMethod(baseApi.getClass(), "update", Object.class);
+        register2Spring(baseApi, url, requestMethod, method, MediaType.APPLICATION_JSON_VALUE);
     }
 
 
@@ -145,18 +158,58 @@ public class ApiManager implements InitializingBean, ApplicationContextAware {
      * 注册删除方法
      *
      * @param entityClass
+     * @param baseApi
      */
-    private void registerDeleteMethod(Class<?> entityClass) {
-
+    private void registerDeleteMethod(Class<?> entityClass, BaseApi<? extends BaseEntity> baseApi) {
+        String url = "/" + StrUtil.lowerFirst(entityClass.getSimpleName()).replace("Entity", "");
+        RequestMethod requestMethod = RequestMethod.DELETE;
+        log.info("{},{}", requestMethod.name(), url);
+        Method method = ReflectionUtils.findMethod(baseApi.getClass(), "delete", Serializable.class);
+        register2Spring(baseApi, url, requestMethod, method, null);
     }
+
 
     /**
      * 注册批量删除方法
      *
      * @param entityClass
+     * @param baseApi
      */
-    private void registerBatchDeleteMethod(Class<?> entityClass) {
+    private void registerBatchDeleteMethod(Class<?> entityClass, BaseApi<? extends BaseEntity> baseApi) {
+        String url = "/" + StrUtil.lowerFirst(entityClass.getSimpleName()).replace("Entity", "/batchDelete");
+        RequestMethod requestMethod = RequestMethod.DELETE;
+        log.info("{},{}", requestMethod.name(), url);
+        Method method = ReflectionUtils.findMethod(baseApi.getClass(), "batchDelete", String.class);
+        register2Spring(baseApi, url, requestMethod, method, null);
+    }
 
+    /**
+     * 注册删除方法
+     *
+     * @param entityClass
+     * @param baseApi
+     */
+    private void registerPhysicalDeleteMethod(Class<?> entityClass, BaseApi<? extends BaseEntity> baseApi) {
+        String url = "/" + StrUtil.lowerFirst(entityClass.getSimpleName()).replace("Entity", "/physicalDelete");
+        RequestMethod requestMethod = RequestMethod.DELETE;
+        log.info("{},{}", requestMethod.name(), url);
+        Method method = ReflectionUtils.findMethod(baseApi.getClass(), "physicalDelete", Serializable.class);
+        register2Spring(baseApi, url, requestMethod, method, null);
+    }
+
+
+    /**
+     * 注册批量删除方法
+     *
+     * @param entityClass
+     * @param baseApi
+     */
+    private void registerPhysicalBatchDeleteMethod(Class<?> entityClass, BaseApi<? extends BaseEntity> baseApi) {
+        String url = "/" + StrUtil.lowerFirst(entityClass.getSimpleName()).replace("Entity", "/physicalBatchDelete");
+        RequestMethod requestMethod = RequestMethod.DELETE;
+        log.info("{},{}", requestMethod.name(), url);
+        Method method = ReflectionUtils.findMethod(baseApi.getClass(), "physicalBatchDelete", List.class);
+        register2Spring(baseApi, url, requestMethod, method, null);
     }
 
 

@@ -28,11 +28,12 @@ public interface JdbcService {
     /**
      * 查询列表
      *
+     * @param entityClass
      * @param entity
      * @param <T>
      * @return
      */
-    <T extends BaseEntity> List<T> list(T entity);
+    <T extends BaseEntity> List<T> list(Class<T> entityClass, T entity);
 
     /**
      * 分页查询
@@ -61,7 +62,7 @@ public interface JdbcService {
      * @param <T>
      * @return
      */
-    <T extends BaseEntity> T update(Class<T> entityClass, T entity);
+    <T extends BaseEntity> boolean update(T entity);
 
     /**
      * 删除
@@ -81,5 +82,25 @@ public interface JdbcService {
      * @return
      */
     <T extends BaseEntity, I extends Serializable> boolean batchDelete(Class<T> entityClass, List<I> ids);
+
+    /**
+     * 物理删除
+     *
+     * @param entityClass
+     * @param id
+     * @return
+     */
+    <T extends BaseEntity> boolean physicalDelete(Class<T> entityClass, Serializable id);
+
+    /**
+     * 物理批量删除
+     *
+     * @param entityClass
+     * @param ids
+     * @param <T>
+     * @return
+     */
+    <T extends BaseEntity, I extends Serializable> boolean physicalBatchDelete(Class<T> entityClass, List<I> ids);
+
 
 }

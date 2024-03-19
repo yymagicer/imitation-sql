@@ -39,12 +39,23 @@ public class LambdaUtil {
     }
 
     /**
+     * 获取完整的对象字段属性名称
+     *
+     * @param entityClass
+     * @param columnName
+     * @return
+     */
+    public static String getFullPropertyName(Class<?> entityClass, String columnName) {
+        return getTableName(entityClass) + "." + columnName;
+    }
+
+    /**
      * 获取表名
      *
      * @param entityClass
      * @return
      */
-    private static String getTableName(Class<?> entityClass) {
+    public static String getTableName(Class<?> entityClass) {
         TableName annotation = entityClass.getAnnotation(TableName.class);
         String tableName;
         if (null == annotation) {

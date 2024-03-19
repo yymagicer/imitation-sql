@@ -32,6 +32,11 @@ public class SqlBuilder<T> {
 
     private InsertExpression<T> insertExpression;
 
+    private UpdateExpression<T> updateExpression;
+
+
+    private DeleteExpression<T> deleteExpression;
+
     private Class<T> entityClass;
     /**
      * sql节点
@@ -57,6 +62,48 @@ public class SqlBuilder<T> {
         this.insertExpression = new InsertExpression<>();
         this.insertExpression.setEntity(entity);
         next(this.insertExpression);
+        return this;
+    }
+
+    /**
+     * 更新
+     *
+     * @return
+     */
+    public SqlBuilder<T> update() {
+        if (this.updateExpression == null) {
+            this.updateExpression = new UpdateExpression<>();
+            this.updateExpression.setEntityClass(entityClass);
+            next(this.updateExpression);
+        }
+        return this;
+    }
+
+    /**
+     * 更新
+     *
+     * @return
+     */
+    public SqlBuilder<T> set(Expression<UpdateExpression<T>> expression) {
+        if (this.updateExpression == null) {
+            this.updateExpression = new UpdateExpression<>();
+            next(this.updateExpression);
+        }
+        expression.apply(this.updateExpression);
+        return this;
+    }
+
+    /**
+     * 更新
+     *
+     * @return
+     */
+    public SqlBuilder<T> delete() {
+        if (this.deleteExpression == null) {
+            this.deleteExpression = new DeleteExpression<>();
+            this.deleteExpression.setEntityClass(entityClass);
+            next(this.deleteExpression);
+        }
         return this;
     }
 

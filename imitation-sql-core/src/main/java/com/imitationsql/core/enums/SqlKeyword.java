@@ -20,6 +20,7 @@ public enum SqlKeyword {
     VALUE("VALUE"),
     VALUES("VALUES"),
     INTO("INTO"),
+    SET("SET"),
     ON("ON"),
     AND("AND"),
     OR("OR"),

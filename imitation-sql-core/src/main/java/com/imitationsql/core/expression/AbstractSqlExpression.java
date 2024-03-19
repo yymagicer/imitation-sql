@@ -23,6 +23,10 @@ import java.util.*;
 public abstract class AbstractSqlExpression<T> implements SqlExpression<T> {
 
     /**
+     * 实体类
+     */
+    protected Class<T> entityClass;
+    /**
      * 实体类对象
      */
     protected Object entity;
@@ -47,15 +51,17 @@ public abstract class AbstractSqlExpression<T> implements SqlExpression<T> {
      *
      * @return
      */
-    protected Class<?> getEntityClass() {
-        Class<?> entityClass;
+    protected Class<T> getEntityClass() {
+        if (null != entityClass) {
+            return entityClass;
+        }
         if (batch && entity instanceof List) {
             List<Object> data = (List<Object>) entity;
-            entityClass = data.get(0).getClass();
+            this.entityClass = (Class<T>) data.get(0).getClass();
         } else {
-            entityClass = entity.getClass();
+            this.entityClass = (Class<T>) entity.getClass();
         }
-        return entityClass;
+        return this.entityClass;
     }
 
     /**
