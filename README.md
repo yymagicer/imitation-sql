@@ -76,7 +76,7 @@ public class UserEntity extends BaseEntity {
 
 ```json
 {
-  "code": "0", //返回码 0-成功；-1失败
+  "code": "0", ##返回码 0-成功；-1失败
   "msg": "成功",
   "data": {} //具体返回值
 }
